@@ -15,14 +15,16 @@ RUN apt-get update \
     maven \
     make \
     gcc \
-    zlib1g-dev
+    zlib1g-dev \
+    libffi-dev
 
 RUN apt -y update
 
 ARG OPENSSL_VERSION=1.1.1l
 ARG PYTHON=python3
 ARG PIP=pip3
-ARG PYTHON_VERSION=3.6.13
+ARG PYTHON_VERSION=3.9.10
+ARG MMS_VERSION=1.1.8
 
 # Open-SSL
 RUN wget -q -c https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
@@ -34,7 +36,7 @@ RUN wget -q -c https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz 
  && rmdir /usr/local/ssl/certs \
  && ln -s /etc/ssl/certs /usr/local/ssl/certs
 
-# Install Python-3.6.13 from source
+# Install Python from source
 RUN wget -q https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz \
  && tar -xzf Python-$PYTHON_VERSION.tgz \
  && cd Python-$PYTHON_VERSION \
@@ -45,7 +47,10 @@ RUN wget -q https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VER
  && ln -s /usr/local/bin/$PYTHON /usr/local/bin/python \
  && ${PIP} --no-cache-dir install --upgrade pip
 
-# Remove other Python installations.
+# Install MMS from source
+RUN ${PIP} install --no-cache-dir \
+    multi-model-server
+
 RUN apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
